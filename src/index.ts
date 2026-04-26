@@ -22,12 +22,30 @@ export async function bootstrap(): Promise<void> {
   const app = express();
 
   // Middlewares
-  app.use(
-    cors({
-      origin: [config.FRONTEND_URL],
-      credentials: true,
-    }),
-  );
+  // app.use(
+  //   cors({
+  //     origin: [config.FRONTEND_URL],
+  //     credentials: true,
+  //   }),
+  // );
+
+  const allowedOrigins = [
+  "http://localhost:5173",
+  "https://velux-decor-up6r.vercel.app",
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS not allowed"));
+      }
+    },
+    credentials: true,
+  })
+);
   app.use(express.json());
   app.use(cookieParser());
   app.use(

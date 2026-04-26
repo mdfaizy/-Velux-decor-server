@@ -64,9 +64,16 @@ export async function bootstrap(): Promise<void> {
   app.use("/api/reviews", reviewRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/showrooms", showroomRoutes);
-  app.listen(config.PORT, "127.0.0.1", () => {
-    console.log(`Server running on port ${config.PORT}`);
-  });
+  // app.listen(config.PORT, "127.0.0.1", () => {
+  //   console.log(`Server running on port ${config.PORT}`);
+  // });
+  const PORT = process.env.PORT || config.PORT;
+
+
+  
+app.listen(Number(PORT), () => {
+  console.log(`Server running on port ${PORT}`);
+});
 }
 
 bootstrap().catch((error) => {

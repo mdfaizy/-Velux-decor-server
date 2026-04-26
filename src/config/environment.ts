@@ -18,7 +18,7 @@ export const config = {
   PORT: Number(process.env.PORT) || 8080,
 
   // Frontend URLs
-  FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:5173",
+  FRONTEND_URL: process.env.FRONTEND_URL || "https://velux-decor-6ebi-git-main-md-faizys-projects.vercel.app",
 
   // Api Base URL
   API_BASE_URL: process.env.API_BASE_URL,

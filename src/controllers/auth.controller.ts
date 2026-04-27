@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { User } from "../model";
-
+import { sendEmail } from "../config/mailer";
 // Helper to create JWT
 const signToken = (id: string) => {
   return jwt.sign({ id }, process.env.JWT_SECRET || "fallback_secret", {
@@ -13,7 +13,7 @@ const signToken = (id: string) => {
 
 export const signup = async (req: Request, res: Response) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password ,role } = req.body;
 
     // 1. Check if user exists
     const existingUser = await User.findOne({ email });
@@ -29,7 +29,7 @@ export const signup = async (req: Request, res: Response) => {
       name,
       email,
       password: hashedPassword,
-      role: "user",
+      role: role || "user",
     });
 
     const token = signToken(newUser._id.toString());
@@ -81,32 +81,48 @@ export const signin = async (req: Request, res: Response) => {
 export const forgotPassword = async (req: Request, res: Response) => {
   try {
     const user = await User.findOne({ email: req.body.email });
+
     if (!user) {
       return res.status(404).json({ message: "No user found with that email" });
     }
 
-    // 1. Generate random reset token
+    // 🔥 token generate
     const resetToken = crypto.randomBytes(32).toString("hex");
 
-    // 2. Hash and set to user model
     user.resetPasswordToken = crypto
       .createHash("sha256")
       .update(resetToken)
       .digest("hex");
 
-    // Set expiry to 10 minutes
     user.resetPasswordExpire = new Date(Date.now() + 10 * 60 * 1000);
 
     await user.save({ validateBeforeSave: false });
 
-    // 3. Send back in response (Temporary)
-    const resetURL = `${req.protocol}://${req.get("host")}/api/auth/resetPassword/${resetToken}`;
+    // 🔥 FRONTEND URL
+    // const resetURL = `http://localhost:5173/reset-password/${resetToken}`;
+
+    const resetURL = `https://velux-decor-up6r.vercel.app/reset-password/${resetToken}`;
+
+    // 🔥 EMAIL TEMPLATE
+    const html = `
+      <h2>Password Reset Request</h2>
+      <p>Click below to reset your password:</p>
+      <a href="${resetURL}" target="_blank">Reset Password</a>
+      <p>This link will expire in 10 minutes.</p>
+    `;
+
+    // 🔥 SEND EMAIL
+    await sendEmail({
+      to: user.email,
+      subject: "Password Reset",
+      html,
+    });
 
     res.status(200).json({
-      status: "success",
-      message: "Token sent to response!",
-      resetURL, // You will use this in your frontend
+      success: true,
+      message: "Reset link sent to email",
     });
+
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }

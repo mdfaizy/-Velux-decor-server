@@ -35,17 +35,22 @@ import { uploadImageToCloudinary } from "../utils/cloudinary";
 export const createReview = async (req: Request, res: Response) => {
   try {
     const { reviewerName, location, rating, title, project } = req.body;
-
+console.log("REQ FILES 👉", req.files);
     let imageUrl: string = "";
 
     if (req.files?.image) {
-      const file = Array.isArray(req.files.image)
-        ? req.files.image[0]
-        : req.files.image;
+  const file = Array.isArray(req.files.image)
+    ? req.files.image[0]
+    : req.files.image;
 
-      const uploaded = await uploadImageToCloudinary(file);
-      imageUrl = uploaded || "";
-    }
+  console.log("FILE 👉", file); // 🔍 check
+
+  const uploaded = await uploadImageToCloudinary(file);
+
+  console.log("IMAGE URL 👉", uploaded); // 🔍 check
+
+  imageUrl = uploaded || "";
+}
 
     const review = await Review.create({
       reviewerName,

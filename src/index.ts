@@ -10,6 +10,7 @@ import fileUpload from "express-fileupload";
 import categoryRoutes from "./routes/category.routes"
 import contactRoutes from "./routes/contactRoutes"
 import showroomRoutes from "./routes/showroom.routes";
+import enquiryRoutes from "./routes/enquiry.route"
 // Importing the Database Connection
 import dbConnection from "./config/db";
 dbConnection();
@@ -82,6 +83,7 @@ app.use(
   app.use("/api/reviews", reviewRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/showrooms", showroomRoutes);
+app.use("/api/enquiry", enquiryRoutes);
   // app.listen(config.PORT, "127.0.0.1", () => {
   //   console.log(`Server running on port ${config.PORT}`);
   // });

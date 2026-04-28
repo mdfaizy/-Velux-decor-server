@@ -36,3 +36,40 @@ export const createEnquiry = async (req: Request, res: Response) => {
     });
   }
 };
+
+
+export const getAllEnquiries = async (req: Request, res: Response) => {
+  try {
+    const enquiries = await Enquiry.find()
+      .populate("product", "name")   // ✅ important
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      data: enquiries,
+    });
+
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const deleteEnquiry = async (req: Request, res: Response) => {
+  try {
+    await Enquiry.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({
+      success: true,
+      message: "Deleted successfully",
+    });
+
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

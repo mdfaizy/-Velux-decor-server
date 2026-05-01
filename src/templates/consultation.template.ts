@@ -62,3 +62,47 @@ export const consultationTemplate = (data: ConsultationMailData) => {
     </div>
   `;
 };
+
+
+export const userConfirmationTemplate = (fullName: string) => {
+  return `
+  <div style="font-family: Arial, sans-serif; background:#f4f6f8; padding:20px;">
+    
+    <div style="max-width:600px;margin:auto;background:#fff;border-radius:10px;overflow:hidden;">
+      
+      <!-- Header -->
+      <div style="background:#4f46e5;color:#fff;padding:20px;text-align:center;">
+        <h2>✅ Confirmation</h2>
+      </div>
+
+      <!-- Body -->
+      <div style="padding:25px;color:#333;">
+        <h3>Hello ${fullName},</h3>
+
+        <p style="font-size:15px;line-height:1.6;">
+          Thank you for booking a consultation with us. Our team will contact you shortly.
+        </p>
+
+        <p style="font-size:15px;line-height:1.6;">
+          Please keep your phone available for further communication.
+        </p>
+
+        <div style="text-align:center;margin:25px 0;">
+          <a href="#" style="background:#4f46e5;color:#fff;padding:12px 20px;border-radius:6px;text-decoration:none;">
+            View Details
+          </a>
+        </div>
+
+        <p>Regards,<br/><strong>Your Company Team</strong></p>
+      </div>
+
+      <!-- Footer -->
+      <div style="background:#f1f1f1;text-align:center;padding:10px;font-size:12px;">
+        © ${new Date().getFullYear()} Your Company
+      </div>
+
+    </div>
+
+  </div>
+  `;
+};

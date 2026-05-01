@@ -1,41 +1,8 @@
-// import { Request, Response } from "express";
-// import { Consultation } from "../model";
-
-// export const createConsultation = async (req: Request, res: Response) => {
-//   try {
-//     const { fullName, mobileNumber, emailAddress, city, preferredDate } =
-//       req.body;
-
-//     const newConsultation = new Consultation({
-//       fullName,
-//       mobileNumber,
-//       emailAddress,
-//       city,
-//       preferredDate,
-//     });
-
-//     const savedConsultation = await newConsultation.save();
-
-//     res.status(201).json({
-//       message: "Consultation request created successfully",
-//       data: savedConsultation,
-//       success: true,
-//     });
-//   } catch (error: any) {
-//     console.error("Error creating consultation request:", error);
-//     res.status(500).json({
-//       message: "Something went wrong while creating the consultation request",
-//       error: error.message,
-//       success: false,
-//     });
-//   }
-// };
 
 import { Request, Response } from "express";
 import { Consultation } from "../model";
 import { sendEmail } from "../config/mailer";
-import { consultationTemplate } from "../templates/consultation.template";
-const adminEmail = process.env.ADMIN_EMAIL;
+import { consultationTemplate,userConfirmationTemplate  } from "../templates/consultation.template";
 
 export const createConsultation = async (req: Request, res: Response) => {
   try {
@@ -63,7 +30,7 @@ export const createConsultation = async (req: Request, res: Response) => {
       data: savedConsultation,
     });
 
-    // ✅ background email
+    // ✅ Admin Email
     const adminEmail = process.env.ADMIN_EMAIL;
 
     if (!adminEmail) {
@@ -85,11 +52,14 @@ export const createConsultation = async (req: Request, res: Response) => {
       html: adminHtml,
     }).catch(err => console.error("Admin email failed:", err));
 
+    // ✅ User Email (using template)
     if (emailAddress) {
+      const userHtml = userConfirmationTemplate(fullName);
+
       sendEmail({
         to: emailAddress,
-        subject: "Confirmation",
-        html: `Hello ${fullName}`,
+        subject: "Consultation Confirmation ✅",
+        html: userHtml,
       }).catch(err => console.error("User email failed:", err));
     }
 
@@ -103,81 +73,7 @@ export const createConsultation = async (req: Request, res: Response) => {
     });
   }
 };
-// export const createConsultation = async (req: Request, res: Response) => {
-//   try {
-//     const { fullName, mobileNumber, emailAddress, city, preferredDate } =
-//       req.body;
 
-//     /* ================= VALIDATION ================= */
-//     if (!fullName || !mobileNumber) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Full name & mobile required ❌",
-//       });
-//     }
-
-//     /* ================= SAVE DB ================= */
-//     const newConsultation = new Consultation({
-//       fullName,
-//       mobileNumber,
-//       emailAddress,
-//       city,
-//       preferredDate,
-//     });
-
-//     const savedConsultation = await newConsultation.save();
-
-//     /* ================= ADMIN EMAIL ================= */
-//     const adminHtml = consultationTemplate({
-//       fullName,
-//       mobileNumber,
-//       emailAddress,
-//       city,
-//       preferredDate,
-//     });
-//     await sendEmail({
-//       to: process.env.ADMIN_EMAIL!,
-//       subject: "New Consultation Booking 📅",
-//       html: adminHtml,
-//     });
-
-//     /* ================= USER EMAIL (OPTIONAL) ================= */
-//     if (emailAddress) {
-//       await sendEmail({
-//         to: emailAddress,
-//         subject: "Your Consultation Request Received ✅",
-//         html: `
-//           <div style="font-family:Arial; padding:20px;">
-//             <h2>Hello ${fullName} 👋</h2>
-//             <p>Your consultation request has been received.</p>
-//             <p>Our team will contact you shortly 📞</p>
-
-//             <br/>
-//             <p><b>Preferred Date:</b> ${preferredDate || "-"}</p>
-
-//             <br/>
-//             <p>Regards,<br/>Team Velux Decor</p>
-//           </div>
-//         `,
-//       });
-//     }
-
-//     res.status(201).json({
-//       message: "Consultation request created successfully",
-//       data: savedConsultation,
-//       success: true,
-//     });
-
-//   } catch (error: any) {
-//     console.error("Consultation Error:", error);
-
-//     res.status(500).json({
-//       message: "Something went wrong",
-//       error: error.message,
-//       success: false,
-//     });
-//   }
-// };
 export const getAllConsultations = async (req: Request, res: Response) => {
   try {
     const consultations = await Consultation.find().sort({ createdAt: -1 });

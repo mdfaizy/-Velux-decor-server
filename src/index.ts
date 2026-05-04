@@ -11,6 +11,7 @@ import categoryRoutes from "./routes/category.routes"
 import contactRoutes from "./routes/contactRoutes"
 import showroomRoutes from "./routes/showroom.routes";
 import enquiryRoutes from "./routes/enquiry.route"
+import subCategoryRoute from "./routes/subcategory.routes"
 // Importing the Database Connection
 import dbConnection from "./config/db";
 dbConnection();
@@ -53,6 +54,7 @@ app.use(
     fileUpload({
       useTempFiles: true,
       tempFileDir: "/tmp/",
+      
     }),
   );
 
@@ -76,7 +78,8 @@ app.use(
   app.use("/api/auth", AuthRoutes);
 
   app.use("/api/products", productRoutes);
-  app.use('/api/category',categoryRoutes)
+  app.use('/api/category',categoryRoutes);
+  app.use("/api/subcategory",subCategoryRoute);
 
   app.use("/api/consultations", consultationRoutes);
 

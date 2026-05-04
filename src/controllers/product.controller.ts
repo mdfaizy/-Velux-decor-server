@@ -545,12 +545,10 @@ export const updateProduct = async (req: Request, res: Response) => {
   }
 };
 
-
 export const getProductsBySlug = async (req: Request, res: Response) => {
   try {
     const { categorySlug, subCategorySlug } = req.params;
 
-    // ✅ find category
     const category = await Category.findOne({ slug: categorySlug });
     if (!category) {
       return res.status(404).json({
@@ -559,35 +557,41 @@ export const getProductsBySlug = async (req: Request, res: Response) => {
       });
     }
 
-    // ✅ case 1: subcategory present
+    // ✅ TRY SUBCATEGORY
     if (subCategorySlug) {
       const subCategory = await SubCategory.findOne({
         slug: subCategorySlug,
         category: category._id,
       });
 
-      if (!subCategory) {
-        return res.status(404).json({
-          success: false,
-          message: "SubCategory not found",
-        });
+      // 🔥 IMPORTANT CHANGE (NO 404)
+      if (subCategory) {
+        const products = await Product.find({
+          category: category._id,
+          subCategory: subCategory._id,
+        })
+          .populate("category", "name slug")
+          .populate("subCategory", "name slug");
+
+        return res.json({ success: true, data: products });
       }
 
-      const products = await Product.find({
+      // 🔥 FALLBACK (subcategory not found → category products)
+      const fallbackProducts = await Product.find({
         category: category._id,
-        subCategory: subCategory._id,
       })
         .populate("category", "name slug")
         .populate("subCategory", "name slug");
 
-      return res.json({ success: true, data: products });
+      return res.json({ success: true, data: fallbackProducts });
     }
 
-    // ✅ case 2: only category (no subcategory)
+    // ✅ ONLY CATEGORY
     const products = await Product.find({
       category: category._id,
-      subCategory: null,
-    }).populate("category", "name slug");
+    })
+      .populate("category", "name slug")
+      .populate("subCategory", "name slug");
 
     return res.json({ success: true, data: products });
 
@@ -598,3 +602,57 @@ export const getProductsBySlug = async (req: Request, res: Response) => {
     });
   }
 };
+
+
+// export const getProductsBySlug = async (req: Request, res: Response) => {
+//   try {
+//     const { categorySlug, subCategorySlug } = req.params;
+
+//     // ✅ find category
+//     const category = await Category.findOne({ slug: categorySlug });
+//     if (!category) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Category not found",
+//       });
+//     }
+
+//     // ✅ case 1: subcategory present
+//     if (subCategorySlug) {
+//       const subCategory = await SubCategory.findOne({
+//         slug: subCategorySlug,
+//         category: category._id,
+//       });
+
+//       if (!subCategory) {
+//         return res.status(404).json({
+//           success: false,
+//           message: "SubCategory not found",
+//         });
+//       }
+
+//       const products = await Product.find({
+//         category: category._id,
+//         subCategory: subCategory._id,
+//       })
+//         .populate("category", "name slug")
+//         .populate("subCategory", "name slug");
+
+//       return res.json({ success: true, data: products });
+//     }
+
+//     // ✅ case 2: only category (no subcategory)
+//     const products = await Product.find({
+//       category: category._id,
+//       subCategory: null,
+//     }).populate("category", "name slug");
+
+//     return res.json({ success: true, data: products });
+
+//   } catch (error: any) {
+//     return res.status(500).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// };

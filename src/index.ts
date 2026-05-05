@@ -77,10 +77,10 @@ app.use(
 
   app.use("/api/auth", AuthRoutes);
 
-  app.use("/api/products", productRoutes);
   app.use('/api/category',categoryRoutes);
   app.use("/api/subcategory",subCategoryRoute);
-
+  app.use("/api/products", productRoutes);  
+  
   app.use("/api/consultations", consultationRoutes);
 
   app.use("/api/reviews", reviewRoutes);

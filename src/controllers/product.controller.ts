@@ -550,6 +550,7 @@ export const getProductsBySlug = async (req: Request, res: Response) => {
     const { categorySlug, subCategorySlug } = req.params;
 
     const category = await Category.findOne({ slug: categorySlug });
+
     if (!category) {
       return res.status(404).json({
         success: false,
@@ -557,43 +558,45 @@ export const getProductsBySlug = async (req: Request, res: Response) => {
       });
     }
 
-    // ✅ TRY SUBCATEGORY
+    // ✅ SUBCATEGORY CASE
     if (subCategorySlug) {
       const subCategory = await SubCategory.findOne({
         slug: subCategorySlug,
         category: category._id,
       });
 
-      // 🔥 IMPORTANT CHANGE (NO 404)
-      if (subCategory) {
-        const products = await Product.find({
-          category: category._id,
-          subCategory: subCategory._id,
-        })
-          .populate("category", "name slug")
-          .populate("subCategory", "name slug");
-
-        return res.json({ success: true, data: products });
+      if (!subCategory) {
+        return res.json({
+          success: true,
+          data: [],
+          message: "No subcategory found",
+        });
       }
 
-      // 🔥 FALLBACK (subcategory not found → category products)
-      const fallbackProducts = await Product.find({
+      const products = await Product.find({
         category: category._id,
+        subCategory: subCategory._id,
       })
         .populate("category", "name slug")
         .populate("subCategory", "name slug");
 
-      return res.json({ success: true, data: fallbackProducts });
+      return res.json({
+        success: true,
+        data: products,
+      });
     }
 
-    // ✅ ONLY CATEGORY
+    // ✅ CATEGORY ONLY
     const products = await Product.find({
       category: category._id,
     })
       .populate("category", "name slug")
       .populate("subCategory", "name slug");
 
-    return res.json({ success: true, data: products });
+    return res.json({
+      success: true,
+      data: products,
+    });
 
   } catch (error: any) {
     return res.status(500).json({

@@ -1,43 +1,79 @@
+// // // import { Router } from "express";
+// // // import {
+// // //   createProduct,
+// // //   deleteProduct,
+// // //   getAllProducts,
+// // //   getProductById,
+// // //   updateProduct,   
+// // //   getProductBySlug,   
+// // // } from "../controllers/product.controller"; // Adjust path as needed
+
+// // // const router = Router();
+
+// // // /**
+// // //  * @route   GET /api/products
+// // //  * @desc    Get all products
+// // //  */
+// // // router.get("/", getAllProducts);
+
+// // // /**
+// // //  * @route   GET /api/products/:id
+// // //  * @desc    Get a single product by ID
+// // //  */
+// // // router.get("/:id", getProductById);
+
+// // // /**
+// // //  * @route   POST /api/products
+// // //  * @desc    Create a new product (handles multiple image uploads)
+// // //  */
+// // // router.post("/", createProduct);
+
+// // // /**
+// // //  * @route   DELETE /api/products/:id
+// // //  * @desc    Delete product and its images from Cloudinary
+// // //  */
+
+// // // router.put("/:id", updateProduct);
+// // // router.delete("/:id", deleteProduct);
+// // // router.get("/:categorySlug/:subCategorySlug/:productSlug", getProductBySlug);
+// // // export default router;
+
+
+
 // // import { Router } from "express";
 // // import {
 // //   createProduct,
 // //   deleteProduct,
 // //   getAllProducts,
 // //   getProductById,
-// //   updateProduct,   
-// //   getProductBySlug,   
-// // } from "../controllers/product.controller"; // Adjust path as needed
+// //   updateProduct,
+// //   getProductBySlug,
+// //   getProductsBySlug, // 🔥 ADD THIS
+// // } from "../controllers/product.controller";
 
 // // const router = Router();
 
-// // /**
-// //  * @route   GET /api/products
-// //  * @desc    Get all products
-// //  */
+// // // ✅ GET ALL
 // // router.get("/", getAllProducts);
 
-// // /**
-// //  * @route   GET /api/products/:id
-// //  * @desc    Get a single product by ID
-// //  */
-// // router.get("/:id", getProductById);
+// // // ✅ PRODUCT DETAIL (slug) - MOST SPECIFIC FIRST
+// // router.get("/:categorySlug/:subCategorySlug/:productSlug", getProductBySlug);
 
-// // /**
-// //  * @route   POST /api/products
-// //  * @desc    Create a new product (handles multiple image uploads)
-// //  */
+// // // ✅ CATEGORY + SUBCATEGORY
+// // router.get("/:categorySlug/:subCategorySlug", getProductsBySlug);
+
+// // // ✅ CATEGORY ONLY
+// // router.get("/category/:categorySlug", getProductsBySlug);
+
+// // // ✅ GET BY ID (SAFE)
+// // router.get("/id/:id", getProductById);
+
+// // // CREATE / UPDATE / DELETE
 // // router.post("/", createProduct);
-
-// // /**
-// //  * @route   DELETE /api/products/:id
-// //  * @desc    Delete product and its images from Cloudinary
-// //  */
-
 // // router.put("/:id", updateProduct);
 // // router.delete("/:id", deleteProduct);
-// // router.get("/:categorySlug/:subCategorySlug/:productSlug", getProductBySlug);
-// // export default router;
 
+// // export default router;
 
 
 // import { Router } from "express";
@@ -48,27 +84,57 @@
 //   getProductById,
 //   updateProduct,
 //   getProductBySlug,
-//   getProductsBySlug, // 🔥 ADD THIS
+//   getProductsBySlug,
 // } from "../controllers/product.controller";
 
 // const router = Router();
 
-// // ✅ GET ALL
+// // // ✅ GET ALL PRODUCTS
+// // router.get("/", getAllProducts);
+
+// // // 🔥 PRODUCT DETAIL (WITH SUBCATEGORY)
+// // router.get("/:categorySlug/:subCategorySlug/:productSlug", getProductBySlug);
+
+// // // 🔥 PRODUCT DETAIL (NO SUBCATEGORY)
+// // router.get("/:categorySlug/:productSlug", getProductBySlug);
+
+// // // 🔥 CATEGORY + SUBCATEGORY PRODUCTS
+// // router.get("/:categorySlug/:subCategorySlug", getProductsBySlug);
+
+// // // 🔥 CATEGORY ONLY PRODUCTS (IMPORTANT)
+// // router.get("/:categorySlug", getProductsBySlug);
+
+// // // ✅ GET PRODUCT BY ID (SAFE ROUTE)
+// // router.get("/id/:id", getProductById);
+
+// // // ✅ CREATE PRODUCT
+// // router.post("/", createProduct);
+
+// // // ✅ UPDATE PRODUCT
+// // router.put("/:id", updateProduct);
+
+// // // ✅ DELETE PRODUCT
+// // router.delete("/:id", deleteProduct);
+
+// // ✅ GET ALL PRODUCTS
 // router.get("/", getAllProducts);
 
-// // ✅ PRODUCT DETAIL (slug) - MOST SPECIFIC FIRST
+// // 🔥 PRODUCT DETAIL (MOST SPECIFIC FIRST)
 // router.get("/:categorySlug/:subCategorySlug/:productSlug", getProductBySlug);
 
-// // ✅ CATEGORY + SUBCATEGORY
+// // 🔥 PRODUCT DETAIL (NO SUBCATEGORY)
+// router.get("/:categorySlug/:productSlug", getProductBySlug);
+
+// // 🔥 CATEGORY + SUBCATEGORY PRODUCTS
 // router.get("/:categorySlug/:subCategorySlug", getProductsBySlug);
 
-// // ✅ CATEGORY ONLY
-// router.get("/category/:categorySlug", getProductsBySlug);
+// // 🔥 CATEGORY PRODUCTS
+// router.get("/:categorySlug", getProductsBySlug);
 
-// // ✅ GET BY ID (SAFE)
+// // ✅ SAFE ROUTE (ALWAYS KEEP ABOVE PARAM ROUTES)
 // router.get("/id/:id", getProductById);
 
-// // CREATE / UPDATE / DELETE
+// // CRUD
 // router.post("/", createProduct);
 // router.put("/:id", updateProduct);
 // router.delete("/:id", deleteProduct);
@@ -89,31 +155,24 @@ import {
 
 const router = Router();
 
-// ✅ GET ALL PRODUCTS
+// ✅ GET ALL
 router.get("/", getAllProducts);
 
-// 🔥 PRODUCT DETAIL (WITH SUBCATEGORY)
+// 🔥 PRODUCT DETAIL (MOST SPECIFIC FIRST)
 router.get("/:categorySlug/:subCategorySlug/:productSlug", getProductBySlug);
+// router.get("/:categorySlug/:productSlug", getProductBySlug);
+router.get("/detail/:productSlug", getProductBySlug);
 
-// 🔥 PRODUCT DETAIL (NO SUBCATEGORY)
-router.get("/:categorySlug/:productSlug", getProductBySlug);
-
-// 🔥 CATEGORY + SUBCATEGORY PRODUCTS
+// 🔥 PRODUCT LIST
 router.get("/:categorySlug/:subCategorySlug", getProductsBySlug);
-
-// 🔥 CATEGORY ONLY PRODUCTS (IMPORTANT)
 router.get("/:categorySlug", getProductsBySlug);
 
-// ✅ GET PRODUCT BY ID (SAFE ROUTE)
+// ✅ SAFE ROUTE
 router.get("/id/:id", getProductById);
 
-// ✅ CREATE PRODUCT
+// CRUD
 router.post("/", createProduct);
-
-// ✅ UPDATE PRODUCT
 router.put("/:id", updateProduct);
-
-// ✅ DELETE PRODUCT
 router.delete("/:id", deleteProduct);
 
 export default router;

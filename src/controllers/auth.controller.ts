@@ -13,7 +13,7 @@ const signToken = (id: string) => {
 
 export const signup = async (req: Request, res: Response) => {
   try {
-    const { name, email, password ,role } = req.body;
+    const { name, email, password } = req.body;
 
     // 1. Check if user exists
     const existingUser = await User.findOne({ email });
@@ -29,9 +29,11 @@ export const signup = async (req: Request, res: Response) => {
       name,
       email,
       password: hashedPassword,
-      role: role || "user",
+      // role: role || "user",
+       role: "user",
     });
 
+    
     const token = signToken(newUser._id.toString());
 
     res.status(201).json({
@@ -209,6 +211,8 @@ export const getUserById = async (req: Request, res: Response) => {
 
 export const updateUser = async (req: Request, res: Response) => {
   try {
+
+   
     const { name, email, role, status } = req.body;
 
     const user = await User.findByIdAndUpdate(

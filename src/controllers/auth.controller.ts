@@ -34,7 +34,8 @@ export const signup = async (req: Request, res: Response) => {
     });
 
     
-    const token = signToken(newUser._id.toString());
+    // const token = signToken(newUser._id.toString());
+    const token = signToken(newUser.id);
 
     res.status(201).json({
       status: "success",
@@ -209,20 +210,63 @@ export const getUserById = async (req: Request, res: Response) => {
   }
 };
 
-export const updateUser = async (req: Request, res: Response) => {
-  try {
+// export const updateUser = async (req: Request, res: Response) => {
+//   try {
 
    
+//     const { name, email, role, status } = req.body;
+
+//     const user = await User.findByIdAndUpdate(
+//       req.params.id,
+//       {
+//         name,
+//         email,
+//         role,
+//         status,
+//       },
+//       {
+//         new: true,
+//         runValidators: true,
+//       }
+//     ).select("-password");
+
+//     if (!user) {
+//       return res.status(404).json({
+//         message: "User not found",
+//       });
+//     }
+
+//     res.status(200).json({
+//       status: "success",
+//       message: "User updated successfully",
+//       data: user,
+//     });
+
+//   } catch (error: any) {
+//     res.status(500).json({
+//       message: error.message,
+//     });
+//   }
+// };
+
+export const updateUser = async (req: any, res: Response) => {
+  try {
     const { name, email, role, status } = req.body;
+
+    let updateData: any = {
+      name,
+      email,
+    };
+
+    // 🔥 ONLY ADMIN CAN UPDATE ROLE & STATUS
+    if (req.user.role === "admin") {
+      if (role) updateData.role = role;
+      if (status) updateData.status = status;
+    }
 
     const user = await User.findByIdAndUpdate(
       req.params.id,
-      {
-        name,
-        email,
-        role,
-        status,
-      },
+      updateData,
       {
         new: true,
         runValidators: true,
@@ -247,7 +291,6 @@ export const updateUser = async (req: Request, res: Response) => {
     });
   }
 };
-
 export const deleteUser = async (req: Request, res: Response) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);

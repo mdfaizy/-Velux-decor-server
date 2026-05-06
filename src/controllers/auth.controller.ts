@@ -2,7 +2,8 @@ import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import { User } from "../model";
+// import { User } from "../model";
+import { User, UserRole } from "../model";
 import { sendEmail } from "../config/mailer";
 // Helper to create JWT
 const signToken = (id: string) => {
@@ -30,12 +31,14 @@ export const signup = async (req: Request, res: Response) => {
       email,
       password: hashedPassword,
       // role: role || "user",
-       role: "user",
+      //  role: "user",
+      role: UserRole.USER,
     });
 
     
     // const token = signToken(newUser._id.toString());
-    const token = signToken(newUser.id);
+    // const token = signToken(newUser.id);
+    const token = signToken((newUser as any)._id.toString());
 
     res.status(201).json({
       status: "success",

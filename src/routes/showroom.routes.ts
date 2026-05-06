@@ -3,10 +3,11 @@ import {
   createShowroom,
   getShowrooms,
 } from "../controllers/showroom.controller";
+import { authenticateToken } from "../middleware/auth.middleware";
 
 const router = express.Router();
 
-router.post("/", createShowroom);
+router.post("/",authenticateToken, createShowroom);
 router.get("/", getShowrooms);
 
 export default router;

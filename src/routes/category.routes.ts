@@ -27,11 +27,12 @@ import {
   deleteCategory,
   toggleCategoryStatus,
 } from "../controllers/category.controller";
+import { authenticateToken } from "../middleware/auth.middleware";
 
 const router = express.Router();
 
 // ✅ CREATE
-router.post("/", createCategory);
+router.post("/",authenticateToken, createCategory);
 
 // ✅ GET ALL
 router.get("/", getAllCategories);
@@ -40,12 +41,12 @@ router.get("/", getAllCategories);
 router.get("/with-sub", getCategoryWithSub);
 
 // ✅ UPDATE
-router.put("/:id", updateCategory);
+router.put("/:id",authenticateToken, updateCategory);
 
 // ✅ DELETE
-router.delete("/:id", deleteCategory);
+router.delete("/:id",authenticateToken, deleteCategory);
 
 // ✅ TOGGLE ACTIVE
-router.patch("/toggle/:id", toggleCategoryStatus);
+router.patch("/toggle/:id", authenticateToken,toggleCategoryStatus);
 
 export default router;

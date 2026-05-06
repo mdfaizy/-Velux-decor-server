@@ -8,11 +8,12 @@ import {
   toggleSubCategory,
   getSubByCategorySlug,
 } from "../controllers/subcategory.controller";
+import { authenticateToken } from "../middleware/auth.middleware";
 
 const router = express.Router();
 
 // ✅ CREATE SUB CATEGORY
-router.post("/", createSubCategory);
+router.post("/",authenticateToken, createSubCategory);
 
 router.get("/", getAllSubCategories); // ✅ ADD THIS
 // ✅ GET SUBCATEGORY BY CATEGORY ID

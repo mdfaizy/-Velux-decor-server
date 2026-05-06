@@ -5,39 +5,84 @@ import crypto from "crypto";
 // import { User } from "../model";
 import { User, UserRole } from "../model";
 import { sendEmail } from "../config/mailer";
+import config from "../config/environment";
 // Helper to create JWT
 const signToken = (id: string) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET || "fallback_secret", {
-    expiresIn: "1d",
-  });
+  return jwt.sign(
+    { id },
+    config.JWT.SECRET,
+    {
+      expiresIn: "1d",
+    }
+  );
 };
+
+// export const signup = async (req: Request, res: Response) => {
+//   try {
+//     const { name, email, password } = req.body;
+
+//     // 1. Check if user exists
+//     const existingUser = await User.findOne({ email });
+//     if (existingUser) {
+//       return res.status(400).json({ message: "User already exists" });
+//     }
+
+//     // 2. Hash password
+//     const hashedPassword = await bcrypt.hash(password, 12);
+
+//     // 3. Create user
+//     const newUser = await User.create({
+//       name,
+//       email,
+//       password: hashedPassword,
+//       // role: role || "user",
+//       //  role: "user",
+//       role: UserRole.USER,
+//     });
+
+    
+//     // const token = signToken(newUser._id.toString());
+//     // const token = signToken(newUser.id);
+//     const token = signToken((newUser as any)._id.toString());
+
+//     res.status(201).json({
+//       status: "success",
+//       token,
+//       data: { user: newUser },
+//     });
+//   } catch (error: any) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
 
 export const signup = async (req: Request, res: Response) => {
   try {
-    const { name, email, password } = req.body;
 
-    // 1. Check if user exists
+    const { name, email, password, role } = req.body;
+
+    // CHECK USER
     const existingUser = await User.findOne({ email });
+
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({
+        message: "User already exists",
+      });
     }
 
-    // 2. Hash password
+    // HASH PASSWORD
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // 3. Create user
+    // CREATE USER
     const newUser = await User.create({
       name,
       email,
       password: hashedPassword,
-      // role: role || "user",
-      //  role: "user",
-      role: UserRole.USER,
+
+      // ✅ ROLE FROM FRONTEND
+      role: role || UserRole.USER,
     });
 
-    
-    // const token = signToken(newUser._id.toString());
-    // const token = signToken(newUser.id);
     const token = signToken((newUser as any)._id.toString());
 
     res.status(201).json({
@@ -45,8 +90,11 @@ export const signup = async (req: Request, res: Response) => {
       token,
       data: { user: newUser },
     });
+
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      message: error.message,
+    });
   }
 };
 
@@ -180,7 +228,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
     const users = await User.find()
       .select("-password") // 🔥 password hide
       .sort({ createdAt: -1 });
-
+  console.log(users);
     res.status(200).json({
       status: "success",
       results: users.length,

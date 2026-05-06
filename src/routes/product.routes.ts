@@ -152,6 +152,7 @@ import {
   getProductBySlug,
   getProductsBySlug,
 } from "../controllers/product.controller";
+import { authenticateToken } from "../middleware/auth.middleware";
 
 const router = Router();
 
@@ -171,8 +172,8 @@ router.get("/:categorySlug", getProductsBySlug);
 router.get("/id/:id", getProductById);
 
 // CRUD
-router.post("/", createProduct);
-router.put("/:id", updateProduct);
-router.delete("/:id", deleteProduct);
+router.post("/",authenticateToken, createProduct);
+router.put("/:id", authenticateToken,updateProduct);
+router.delete("/:id", authenticateToken,deleteProduct);
 
 export default router;

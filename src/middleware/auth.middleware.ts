@@ -29,6 +29,7 @@
 //       .json({ message: "Invalid token", success: false, err: error.message });
 //   }
 // };
+
 import { Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import config from "../config/environment";
@@ -46,7 +47,8 @@ export const authenticateToken = async (
     const token = authHeader?.startsWith("Bearer ")
       ? authHeader.split(" ")[1]
       : null;
-
+    console.log("AUTH HEADER:", authHeader);
+console.log("TOKEN:", token);
     if (!token) {
       return res.status(401).json({
         success: false,
@@ -58,9 +60,11 @@ export const authenticateToken = async (
       token,
       config.JWT.SECRET
     );
-
+    console.log("DECODED:", decoded);
+console.log("JWT SECRET EXISTS:", !!config.JWT.SECRET);
     const user = await User.findById(decoded.id)
       .select("-password");
+      console.log("USER FOUND:", user);
 
     if (!user) {
       return res.status(401).json({

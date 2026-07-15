@@ -34,6 +34,7 @@ export async function bootstrap(): Promise<void> {
   const allowedOrigins = [
   "http://localhost:5173",
   "https://velux-decor-up6r.vercel.app",
+  "https://www.veluxdecor.com",
 ];
 
 app.use(

@@ -607,6 +607,43 @@ export const getProductsBySlug = async (req: Request, res: Response) => {
 };
 
 
+export const toggleProductStatus = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+
+    const product = await Product.findById(id);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    product.isAvailable = !product.isAvailable;
+
+    await product.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Product ${
+        product.isAvailable ? "activated" : "deactivated"
+      } successfully`,
+      data: product,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
+
 // export const getProductsBySlug = async (req: Request, res: Response) => {
 //   try {
 //     const { categorySlug, subCategorySlug } = req.params;

@@ -234,17 +234,56 @@ export const createCategory = async (req: Request, res: Response) => {
 
 
 // ✅ GET ALL CATEGORY
+// export const getAllCategories = async (_req: Request, res: Response) => {
+//   try {
+//      console.log("GET ALL CATEGORY API CALLED");
+
+//     const data = await Category.find().sort({
+//       createdAt: -1,
+//     });
+
+//     console.log(
+//   data.find(c => c.name === "Office")
+// );
+//     console.log(
+//       data.map(c => ({
+//         name: c.name,
+//         isActive: c.isActive,
+//       }))
+//     );
+
+//     return res.json({
+//       success: true,
+//       data,
+//     });
+
+//   } catch (error: any) {
+//     return res.status(500).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// };
+
+
 export const getAllCategories = async (_req: Request, res: Response) => {
+   console.log("🔥 GET ALL CATEGORY HIT");
   try {
-    const data = await Category.find({ isActive: true }).sort({
+    const data = await Category.find().sort({
       createdAt: -1,
     });
+console.log("Total:", data.length);
+    console.log(
+      data.map((item) => ({
+        name: item.name,
+        isActive: item.isActive,
+      }))
+    );
 
     return res.json({
       success: true,
       data,
     });
-
   } catch (error: any) {
     return res.status(500).json({
       success: false,
@@ -397,11 +436,42 @@ export const deleteCategory = async (req: Request, res: Response) => {
 
 
 // ✅ TOGGLE ACTIVE
+// export const toggleCategoryStatus = async (req: Request, res: Response) => {
+//   try {
+//     const { id } = req.params;
+
+//     const cat = await Category.findById(id);
+
+//     if (!cat) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Category not found",
+//       });
+//     }
+
+//     cat.isActive = !cat.isActive;
+//     await cat.save();
+
+//     return res.json({
+//       success: true,
+//       data: cat,
+//     });
+
+//   } catch (error: any) {
+//     return res.status(500).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// };
+
 export const toggleCategoryStatus = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
     const cat = await Category.findById(id);
+
+    console.log("Before:", cat?.isActive);
 
     if (!cat) {
       return res.status(404).json({
@@ -413,12 +483,14 @@ export const toggleCategoryStatus = async (req: Request, res: Response) => {
     cat.isActive = !cat.isActive;
     await cat.save();
 
+    console.log("After:", cat.isActive);
+
     return res.json({
       success: true,
       data: cat,
     });
-
   } catch (error: any) {
+    console.log(error);
     return res.status(500).json({
       success: false,
       message: error.message,

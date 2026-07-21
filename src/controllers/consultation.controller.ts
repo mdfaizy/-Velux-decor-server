@@ -140,3 +140,42 @@ export const getAConsultation = async (req: Request, res: Response) => {
     });
   }
 };
+
+
+
+export const updateConsultationStatus = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const consultation = await Consultation.findByIdAndUpdate(
+      id,
+      { status },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!consultation) {
+      return res.status(404).json({
+        success: false,
+        message: "Consultation not found",
+      });
+    }
+
+    return res.json({
+      success: true,
+      data: consultation,
+    });
+
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

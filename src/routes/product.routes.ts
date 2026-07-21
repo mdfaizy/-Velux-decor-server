@@ -151,6 +151,7 @@ import {
   updateProduct,
   getProductBySlug,
   getProductsBySlug,
+  toggleProductStatus,
 } from "../controllers/product.controller";
 import { authenticateToken } from "../middleware/auth.middleware";
 
@@ -175,5 +176,5 @@ router.get("/id/:id", getProductById);
 router.post("/",authenticateToken, createProduct);
 router.put("/:id", authenticateToken,updateProduct);
 router.delete("/:id", authenticateToken,deleteProduct);
-
+router.patch("/toggle/:id",authenticateToken,toggleProductStatus);
 export default router;

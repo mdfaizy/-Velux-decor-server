@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 // import { User } from "../model";
-import { User, UserRole } from "../model";
+import { User, UserRole ,UserStatus } from "../model";
 import { sendEmail } from "../config/mailer";
 import config from "../config/environment";
 // Helper to create JWT
@@ -16,63 +16,18 @@ const signToken = (id: string) => {
     }
   );
 };
-
-// export const signup = async (req: Request, res: Response) => {
-//   try {
-//     const { name, email, password } = req.body;
-
-//     // 1. Check if user exists
-//     const existingUser = await User.findOne({ email });
-//     if (existingUser) {
-//       return res.status(400).json({ message: "User already exists" });
-//     }
-
-//     // 2. Hash password
-//     const hashedPassword = await bcrypt.hash(password, 12);
-
-//     // 3. Create user
-//     const newUser = await User.create({
-//       name,
-//       email,
-//       password: hashedPassword,
-//       // role: role || "user",
-//       //  role: "user",
-//       role: UserRole.USER,
-//     });
-
-    
-//     // const token = signToken(newUser._id.toString());
-//     // const token = signToken(newUser.id);
-//     const token = signToken((newUser as any)._id.toString());
-
-//     res.status(201).json({
-//       status: "success",
-//       token,
-//       data: { user: newUser },
-//     });
-//   } catch (error: any) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
-
 export const signup = async (req: Request, res: Response) => {
   try {
-
     const { name, email, password, role } = req.body;
-
     // CHECK USER
     const existingUser = await User.findOne({ email });
-
     if (existingUser) {
       return res.status(400).json({
         message: "User already exists",
       });
     }
-
     // HASH PASSWORD
     const hashedPassword = await bcrypt.hash(password, 12);
-
     // CREATE USER
     const newUser = await User.create({
       name,
@@ -116,6 +71,20 @@ export const signin = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Incorrect email or password" });
     }
 
+    // ✅ Check account status
+if (user.status === UserStatus.INACTIVE) {
+  return res.status(403).json({
+    success: false,
+    message: "Your account is inactive. Please contact the administrator.",
+  });
+}
+
+if (user.status === UserStatus.SUSPENDED) {
+  return res.status(403).json({
+    success: false,
+    message: "Your account has been suspended.",
+  });
+}
     // 3. Update last login
     user.lastLogin = new Date();
     await user.save({ validateBeforeSave: false });
@@ -357,5 +326,53 @@ export const deleteUser = async (req: Request, res: Response) => {
 
   } catch (error: any) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+
+export const toggleUserStatus = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Admin account ko disable mat hone do
+    if (user.role === UserRole.ADMIN) {
+      return res.status(400).json({
+        success: false,
+        message: "Admin account cannot be deactivated",
+      });
+    }
+
+    user.status =
+      user.status === UserStatus.ACTIVE
+        ? UserStatus.INACTIVE
+        : UserStatus.ACTIVE;
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message:
+        user.status === UserStatus.ACTIVE
+          ? "User activated successfully"
+          : "User deactivated successfully",
+      data: user,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };

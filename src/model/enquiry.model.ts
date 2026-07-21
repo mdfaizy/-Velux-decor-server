@@ -5,7 +5,10 @@ export interface IEnquiry extends Document {
   name: string;
   phone: string;
   message?: string;
+
+  status: "pending" | "contacted" | "resolved" | "rejected";
 }
+
 
 const enquirySchema = new Schema(
   {
@@ -23,7 +26,14 @@ const enquirySchema = new Schema(
       required: true,
     },
     message: String,
+    status: {
+  type: String,
+  enum: ["pending", "contacted", "resolved", "rejected"],
+  default: "pending",
+},
   },
+
+  
   { timestamps: true }
 );
 

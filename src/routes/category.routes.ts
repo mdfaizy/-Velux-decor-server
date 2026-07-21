@@ -35,7 +35,12 @@ const router = express.Router();
 router.post("/",authenticateToken, createCategory);
 
 // ✅ GET ALL
-router.get("/", getAllCategories);
+// router.get("/", getAllCategories);
+
+router.get("/", (req, res, next) => {
+  console.log("GET /category route hit");
+  next();
+}, getAllCategories);
 
 // ✅ GET WITH SUBCATEGORY (IMPORTANT 🔥)
 router.get("/with-sub", getCategoryWithSub);

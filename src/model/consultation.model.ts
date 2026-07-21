@@ -6,6 +6,13 @@ export interface ConsultationDocument extends Document {
   emailAddress: string;
   city: string;
   preferredDate: Date;
+  status: ConsultationStatus;
+}
+export enum ConsultationStatus {
+  PENDING = "pending",
+  CONTACTED = "contacted",
+  RESOLVED = "resolved",
+  CANCELLED = "cancelled",
 }
 
 const consultationSchema = new Schema<ConsultationDocument>(
@@ -35,6 +42,12 @@ const consultationSchema = new Schema<ConsultationDocument>(
       type: Date,
       required: true,
     },
+
+    status: {
+  type: String,
+  enum: Object.values(ConsultationStatus),
+  default: ConsultationStatus.PENDING,
+},
   },
   {
     timestamps: true,

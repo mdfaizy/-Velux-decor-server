@@ -73,3 +73,35 @@ export const deleteEnquiry = async (req: Request, res: Response) => {
     });
   }
 };
+
+
+export const updateEnquiryStatus = async (req: Request, res: Response) => {
+  try {
+    const { status } = req.body;
+
+    const enquiry = await Enquiry.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+
+    if (!enquiry) {
+      return res.status(404).json({
+        success: false,
+        message: "Enquiry not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Status updated successfully",
+      data: enquiry,
+    });
+
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

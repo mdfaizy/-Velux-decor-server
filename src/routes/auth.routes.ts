@@ -3,13 +3,18 @@
     import { authenticateToken } from "../middleware/auth.middleware";
     import { restrictTo } from "../middleware/restrictTo";
     import { UserRole } from "../model";
+import { toggleUserStatus } from "../controllers/auth.controller";
     const router = express.Router();
 
     router.post("/signup", authController.signup);
     router.post("/signin", authController.signin);
     router.post("/forgotPassword", authController.forgotPassword);
     router.patch("/resetPassword/:token", authController.resetPassword);
-
+router.patch(
+  "/toggle-status/:id",
+  authenticateToken,
+  toggleUserStatus
+);
     // For profile, you'll need a protect middleware (see next step)
     router.get("/me", authenticateToken, authController.getMe);
     // GET ALL USERS

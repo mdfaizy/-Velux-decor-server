@@ -3,21 +3,30 @@ import {
   createReview,
   getAllReviews,
   getAReview,
+  getAllReviewsAdmin,
+  updateReviewStatus,
   deleteReview,
 } from "../controllers/review.controller";
+import { authenticateToken } from "../middleware/auth.middleware";
+import { restrictTo } from "../middleware/restrictTo";
+import { UserRole } from "../model/user.model";
 
 const router = Router();
+const adminOnly = [authenticateToken, restrictTo(UserRole.ADMIN)];
 
-// Create a new review
+// ✅ PUBLIC
+// Customer submits a review (saved as pending until approved)
 router.post("/", createReview);
 
-// Get all reviews (sorted by newest first)
+// Approved reviews (sorted by newest first)
 router.get("/", getAllReviews);
 
-// Get a single review by ID
-router.get("/:id", getAReview);
+// ✅ ADMIN
+router.get("/admin/all", ...adminOnly, getAllReviewsAdmin);
+router.patch("/:id/status", ...adminOnly, updateReviewStatus);
+router.delete("/:id", ...adminOnly, deleteReview);
 
-// Delete a review
-router.delete("/:id", deleteReview);
+// Get a single approved review by ID
+router.get("/:id", getAReview);
 
 export default router;

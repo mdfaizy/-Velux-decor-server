@@ -12,6 +12,10 @@ import contactRoutes from "./routes/contactRoutes"
 import showroomRoutes from "./routes/showroom.routes";
 import enquiryRoutes from "./routes/enquiry.route"
 import subCategoryRoute from "./routes/subcategory.routes"
+import offerRoutes from "./routes/offer.routes";
+import customerRoutes from "./routes/customer.routes";
+import broadcastRoutes from "./routes/broadcast.routes";
+import whatsappWebhookRoutes from "./routes/whatsappWebhook.routes";
 // Importing the Database Connection
 import dbConnection from "./config/db";
 dbConnection();
@@ -70,7 +74,14 @@ app.use(
 //     credentials: true,
 //   })
 // );
-  app.use(express.json());
+  app.use(
+    express.json({
+      // keep the raw body so the WhatsApp webhook can verify Meta's signature
+      verify: (req: any, _res, buf) => {
+        req.rawBody = buf;
+      },
+    })
+  );
   app.use(cookieParser());
   app.use(
     fileUpload({
@@ -109,6 +120,10 @@ app.use(
 app.use("/api/contact", contactRoutes);
 app.use("/api/showrooms", showroomRoutes);
 app.use("/api/enquiry", enquiryRoutes);
+app.use("/api/offers", offerRoutes);
+app.use("/api/customers", customerRoutes);
+app.use("/api/broadcasts", broadcastRoutes);
+app.use("/api/whatsapp/webhook", whatsappWebhookRoutes);
   // app.listen(config.PORT, "127.0.0.1", () => {
   //   console.log(`Server running on port ${config.PORT}`);
   // });

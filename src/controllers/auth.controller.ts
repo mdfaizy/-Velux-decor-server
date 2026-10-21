@@ -16,6 +16,9 @@ const signToken = (id: string) => {
     }
   );
 };
+
+
+
 export const signup = async (req: Request, res: Response) => {
   try {
     const { name, email, password, role } = req.body;

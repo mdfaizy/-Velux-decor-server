@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Contact from "../model/contactModel";
 import { sendEmail } from "../config/mailer";
 import { contactTemplate } from "../templates/contact.template";
+import { upsertCustomerFromContact } from "./customer.controller";
 
 /* ================= CONTROLLER ================= */
 export const createContact = async (
@@ -9,7 +10,7 @@ export const createContact = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { firstName, lastName, email, phone, service, message } = req.body;
+    const { firstName, lastName, email, phone, service, message, whatsappOptIn } = req.body;
 
     /* ================= VALIDATION ================= */
     if (!firstName || !email || !message) {
@@ -35,6 +36,16 @@ export const createContact = async (
       success: true,
       message: "Message sent successfully ✅",
       data: contact,
+    });
+
+    /* ================= SAVE AS CUSTOMER (for WhatsApp offers) ================= */
+    upsertCustomerFromContact({
+      name: [firstName, lastName].filter(Boolean).join(" "),
+      phone,
+      email,
+      whatsappOptIn: whatsappOptIn === true || whatsappOptIn === "true",
+    }).catch((err) => {
+      console.error("Save customer failed:", err);
     });
 
     /* ================= EMAIL BACKGROUND ================= */

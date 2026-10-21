@@ -6,8 +6,9 @@ export interface IReview extends Document {
   location: string;
   // testimonial: string;
   project: string;
-   image?: string; 
+   image?: string;
   rating: number;
+  status?: "pending" | "approved" | "rejected";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -24,6 +25,11 @@ const reviewSchema = new Schema<IReview>(
      image: {
       type: String, // ✅ ADD THIS
       default: "",
+    },
+    // customer reviews wait for admin approval; older reviews have no status and count as approved
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
     },
   },
   {
